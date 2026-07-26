@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - run: go tool sqlc generate
+      - run: git diff --exit-code internal/db/gen/
+      - run: go tool goose -dir internal/db/migrations sqlite3 /tmp/ci.db up
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test -race ./...
