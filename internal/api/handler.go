@@ -5,20 +5,20 @@ import (
 	"net/http"
 )
 
-type Handler struct {}
+type Handler struct{}
 
 type TestResponse struct {
-    Message string
+	Message string
 }
 
 func NewHandler() *Handler {
 	return &Handler{}
 }
 
-func (handler Handler) Test(writer http.ResponseWriter, req *http.Request) {
-	message := TestResponse{ "Working" }
+func (h Handler) Test(w http.ResponseWriter, r *http.Request) {
+	message := TestResponse{"Working"}
 
-	writer.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(writer).Encode(message)
+	json.NewEncoder(w).Encode(message)
 }

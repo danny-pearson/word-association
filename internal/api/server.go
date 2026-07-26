@@ -13,18 +13,18 @@ type Server struct {
 func NewServer(handler http.Handler) *Server {
 	return &Server{
 		http: &http.Server{
-			Addr: ":8080",
-			Handler: handler,
-			ReadTimeout: 5 * time.Second,
+			Addr:         ":8080",
+			Handler:      handler,
+			ReadTimeout:  5 * time.Second,
 			WriteTimeout: 5 * time.Second,
 		},
 	}
 }
 
-func (server *Server) Start() error {
-	return server.http.ListenAndServe();
+func (s *Server) Start() error {
+	return s.http.ListenAndServe()
 }
 
-func (server *Server) Shutdown(ctx context.Context) error {
-	return server.http.Shutdown(ctx)
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.http.Shutdown(ctx)
 }
