@@ -1,0 +1,24 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    schema: "internal/db/migrations"
+    queries: "internal/db/query"
+    gen:
+      go:
+        package: "gen"
+        out: "internal/db/gen"
+        emit_json_tags: true
+        emit_pointers_for_null_types: true
+        overrides:
+          - column: "puzzles.created_at"
+            go_type: "time.Time"
+          - column: "games.started_at"
+            go_type: "time.Time"
+          - column: "games.completed_at"
+            go_type:
+              type: "time.Time"
+              pointer: true
+          - column: "prompt_templates.created_at"
+            go_type: "time.Time"
+          - column: "generation_runs.started_at"
+            go_type: "time.Time"

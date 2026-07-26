@@ -1,0 +1,16 @@
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Env / secrets
+.env
+.env.local
+
+# Binaries
+/server
+/generate
+/word-association
+
+# macOS
+.DS_Store
