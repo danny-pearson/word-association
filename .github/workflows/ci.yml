@@ -11,6 +11,24 @@ on:
       - develop
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Check formatting
+        run: |
+          unformatted=$(gofmt -l ./cmd ./internal)
+          if [ -n "$unformatted" ]; then
+            echo "These files need gofmt:"
+            echo "$unformatted"
+            gofmt -d ./cmd ./internal
+            exit 1
+          fi
+      - run: go vet ./...
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -18,10 +36,8 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-
       - run: go tool sqlc generate
       - run: git diff --exit-code internal/db/gen/
       - run: go tool goose -dir internal/db/migrations sqlite3 /tmp/ci.db up
       - run: go build ./...
-      - run: go vet ./...
       - run: go test -race ./...
