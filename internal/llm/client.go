@@ -73,6 +73,7 @@ func (c *Client) Send(ctx context.Context, prompt string) (string, error) {
 	switch status := res.StatusCode; status {
 	case http.StatusTooManyRequests:
 		body, _ := io.ReadAll(io.LimitReader(res.Body, 4096))
+
 		return "", fmt.Errorf("%w: %s", ErrRateLimited, body)
 	case http.StatusUnauthorized:
 		return "", ErrUnauthorized

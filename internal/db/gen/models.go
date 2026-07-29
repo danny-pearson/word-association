@@ -4,10 +4,6 @@
 
 package gen
 
-import (
-	"time"
-)
-
 type AnswerAlias struct {
 	PuzzleID        int64  `json:"puzzle_id"`
 	AliasNormalized string `json:"alias_normalized"`
@@ -20,43 +16,43 @@ type Clue struct {
 }
 
 type Game struct {
-	ID          string     `json:"id"`
-	PuzzleID    int64      `json:"puzzle_id"`
-	CluesShown  int64      `json:"clues_shown"`
-	Completed   bool       `json:"completed"`
-	Won         *bool      `json:"won"`
-	StartedAt   time.Time  `json:"started_at"`
-	CompletedAt *time.Time `json:"completed_at"`
+	ID          string  `json:"id"`
+	PuzzleID    int64   `json:"puzzle_id"`
+	CluesShown  int64   `json:"clues_shown"`
+	Completed   bool    `json:"completed"`
+	Won         *bool   `json:"won"`
+	StartedAt   string  `json:"started_at"`
+	CompletedAt *string `json:"completed_at"`
 }
 
 type GenerationRun struct {
-	ID         int64     `json:"id"`
-	PromptID   int64     `json:"prompt_id"`
-	Model      string    `json:"model"`
-	Requested  int64     `json:"requested"`
-	Returned   int64     `json:"returned"`
-	Accepted   int64     `json:"accepted"`
-	StartedAt  time.Time `json:"started_at"`
-	DurationMs *int64    `json:"duration_ms"`
-	Error      *string   `json:"error"`
+	ID         int64   `json:"id"`
+	PromptID   int64   `json:"prompt_id"`
+	Model      string  `json:"model"`
+	Requested  int64   `json:"requested"`
+	Returned   int64   `json:"returned"`
+	Accepted   int64   `json:"accepted"`
+	StartedAt  string  `json:"started_at"`
+	DurationMs *int64  `json:"duration_ms"`
+	Error      *string `json:"error"`
 }
 
 type PromptTemplate struct {
-	ID        int64     `json:"id"`
-	Hash      string    `json:"hash"`
-	Template  string    `json:"template"`
-	Label     string    `json:"label"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        int64  `json:"id"`
+	Hash      string `json:"hash"`
+	Template  string `json:"template"`
+	Label     string `json:"label"`
+	CreatedAt string `json:"created_at"`
 }
 
 type Puzzle struct {
-	ID               int64     `json:"id"`
-	Answer           string    `json:"answer"`
-	AnswerNormalized string    `json:"answer_normalized"`
-	Category         *string   `json:"category"`
-	Difficulty       *int64    `json:"difficulty"`
-	SourceModel      *string   `json:"source_model"`
-	CreatedAt        time.Time `json:"created_at"`
+	ID               int64   `json:"id"`
+	Answer           string  `json:"answer"`
+	AnswerNormalized string  `json:"answer_normalized"`
+	Category         *string `json:"category"`
+	Difficulty       *int64  `json:"difficulty"`
+	SourceModel      *string `json:"source_model"`
+	CreatedAt        string  `json:"created_at"`
 }
 
 type PuzzleClue struct {

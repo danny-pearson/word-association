@@ -7,7 +7,7 @@ CREATE TABLE puzzles (
   category          TEXT,
   difficulty        INTEGER,
   source_model      TEXT,
-  created_at        INTEGER NOT NULL
+  created_at        TEXT NOT NULL
 );
 
 CREATE TABLE clues (
@@ -37,8 +37,8 @@ CREATE TABLE games (
   clues_shown  INTEGER NOT NULL DEFAULT 1 CHECK (clues_shown BETWEEN 1 AND 5),
   completed    BOOLEAN NOT NULL DEFAULT 0,
   won          BOOLEAN,
-  started_at   INTEGER NOT NULL,
-  completed_at INTEGER
+  started_at   TEXT NOT NULL,
+  completed_at TEXT
 );
 CREATE INDEX idx_games_puzzle ON games(puzzle_id);
 
@@ -47,7 +47,7 @@ CREATE TABLE prompt_templates (
   hash       TEXT NOT NULL UNIQUE,      -- sha256 of template text
   template   TEXT NOT NULL,
   label      TEXT NOT NULL,
-  created_at INTEGER NOT NULL
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE generation_runs (
@@ -57,7 +57,7 @@ CREATE TABLE generation_runs (
   requested   INTEGER NOT NULL,
   returned    INTEGER NOT NULL,
   accepted    INTEGER NOT NULL,
-  started_at  INTEGER NOT NULL,
+  started_at  TEXT NOT NULL,
   duration_ms INTEGER,
   error       TEXT
 );
