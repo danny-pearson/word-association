@@ -7,6 +7,7 @@ package gen
 
 import (
 	"context"
+	"strings"
 )
 
 const countPuzzles = `-- name: CountPuzzles :one
@@ -18,4 +19,96 @@ func (q *Queries) CountPuzzles(ctx context.Context) (int64, error) {
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const createPuzzle = `-- name: CreatePuzzle :one
+INSERT INTO puzzles (answer, answer_normalized, source_model, created_at)
+  VALUES (?, ?, ?, ?)
+  RETURNING id
+`
+
+type CreatePuzzleParams struct {
+	Answer           string  `json:"answer"`
+	AnswerNormalized string  `json:"answer_normalized"`
+	SourceModel      *string `json:"source_model"`
+	CreatedAt        string  `json:"created_at"`
+}
+
+func (q *Queries) CreatePuzzle(ctx context.Context, arg CreatePuzzleParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createPuzzle,
+		arg.Answer,
+		arg.AnswerNormalized,
+		arg.SourceModel,
+		arg.CreatedAt,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const findExistingAnswers = `-- name: FindExistingAnswers :many
+SELECT answer_normalized FROM puzzles
+  WHERE answer_normalized IN (/*SLICE:answers*/?)
+`
+
+func (q *Queries) FindExistingAnswers(ctx context.Context, answers []string) ([]string, error) {
+	query := findExistingAnswers
+	var queryParams []interface{}
+	if len(answers) > 0 {
+		for _, v := range answers {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:answers*/?", strings.Repeat(",?", len(answers))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:answers*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var answer_normalized string
+		if err := rows.Scan(&answer_normalized); err != nil {
+			return nil, err
+		}
+		items = append(items, answer_normalized)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const recentAnswers = `-- name: RecentAnswers :many
+SELECT answer FROM puzzles
+  ORDER BY created_at DESC
+  LIMIT ?
+`
+
+func (q *Queries) RecentAnswers(ctx context.Context, limit int64) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, recentAnswers, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var answer string
+		if err := rows.Scan(&answer); err != nil {
+			return nil, err
+		}
+		items = append(items, answer)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
