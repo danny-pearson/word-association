@@ -1,6 +1,6 @@
 package puzzle
 
-type Puzzle struct {
+type GeneratedPuzzle struct {
 	Answer string   `json:"answer"`
 	Clues  []string `json:"clues"`
 }

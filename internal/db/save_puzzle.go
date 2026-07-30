@@ -8,7 +8,7 @@ import (
 	"github.com/danny-pearson/word-association/internal/puzzle"
 )
 
-func (s *Store) SavePuzzle(ctx context.Context, p puzzle.Puzzle, model string) (int64, error) {
+func (s *Store) SavePuzzle(ctx context.Context, p puzzle.GeneratedPuzzle, model string) (int64, error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 
 	if err != nil {

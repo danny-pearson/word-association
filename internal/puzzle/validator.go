@@ -15,7 +15,7 @@ import (
 // Validate is pure: it does not check whether the answer already exists in the
 // library, since that requires the stored puzzles. Callers must apply that
 // check separately, using ReasonDuplicateAnswer.
-func Validate(p Puzzle) error {
+func Validate(p GeneratedPuzzle) error {
 	if len(p.Clues) != 5 {
 		return ValidationError{
 			Reason: ReasonIncorrectClueCount,

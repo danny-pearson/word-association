@@ -51,14 +51,14 @@ func main() {
 		log.Fatalf("an error occurred: %v", err)
 	}
 
-	var puzzles []puzzle.Puzzle
+	var puzzles []puzzle.GeneratedPuzzle
 
 	if err := json.Unmarshal([]byte(extractJSON(text)), &puzzles); err != nil {
 		log.Fatalf("parsing response: %v\n\nraw:\n%s", err, text)
 	}
 
 	var (
-		validPuzzles []puzzle.Puzzle
+		validPuzzles []puzzle.GeneratedPuzzle
 		validAnswers []string
 	)
 

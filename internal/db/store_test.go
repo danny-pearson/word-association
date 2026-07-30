@@ -46,7 +46,7 @@ func testStore(t *testing.T) *Store {
 func TestSavePuzzle(t *testing.T) {
 	store := testStore(t)
 
-	puzzleID, err := store.SavePuzzle(context.Background(), puzzle.Puzzle{
+	puzzleID, err := store.SavePuzzle(context.Background(), puzzle.GeneratedPuzzle{
 		Answer: "bell",
 		Clues:  []string{"church", "brass", "school", "ring", "tower"},
 	}, "test-model")
@@ -92,7 +92,7 @@ func TestSavePuzzleReusesClues(t *testing.T) {
 	store := testStore(t)
 	ctx := context.Background()
 
-	firstID, err := store.SavePuzzle(ctx, puzzle.Puzzle{
+	firstID, err := store.SavePuzzle(ctx, puzzle.GeneratedPuzzle{
 		Answer: "church",
 		Clues:  []string{"bell", "pew", "altar", "spire", "hymn"},
 	}, "test-model")
@@ -101,7 +101,7 @@ func TestSavePuzzleReusesClues(t *testing.T) {
 		t.Fatalf("SavePuzzle() returned error: %v", err)
 	}
 
-	secondID, err := store.SavePuzzle(ctx, puzzle.Puzzle{
+	secondID, err := store.SavePuzzle(ctx, puzzle.GeneratedPuzzle{
 		Answer: "school",
 		Clues:  []string{"bell", "desk", "pupil", "term", "playground"},
 	}, "test-model")
@@ -154,7 +154,7 @@ func TestSavePuzzleRollsBackOnDuplicateAnswer(t *testing.T) {
 	store := testStore(t)
 	ctx := context.Background()
 
-	if _, err := store.SavePuzzle(ctx, puzzle.Puzzle{
+	if _, err := store.SavePuzzle(ctx, puzzle.GeneratedPuzzle{
 		Answer: "bell",
 		Clues:  []string{"church", "brass", "school", "ring", "tower"},
 	}, "test-model"); err != nil {
@@ -162,7 +162,7 @@ func TestSavePuzzleRollsBackOnDuplicateAnswer(t *testing.T) {
 	}
 
 	// Same answer, different clues: the answer collides once normalized.
-	_, err := store.SavePuzzle(ctx, puzzle.Puzzle{
+	_, err := store.SavePuzzle(ctx, puzzle.GeneratedPuzzle{
 		Answer: "Bell",
 		Clues:  []string{"boxing", "cow", "liberty", "door", "dumb"},
 	}, "test-model")
