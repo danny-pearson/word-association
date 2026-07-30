@@ -12,7 +12,7 @@ func (s *Store) SavePuzzle(ctx context.Context, p puzzle.GeneratedPuzzle, model 
 	tx, err := s.db.BeginTx(ctx, nil)
 
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 
 	defer tx.Rollback()
@@ -22,7 +22,7 @@ func (s *Store) SavePuzzle(ctx context.Context, p puzzle.GeneratedPuzzle, model 
 	normalizedAnswer, err := puzzle.Normalize(p.Answer)
 
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 
 	puzzleID, err := qtx.CreatePuzzle(ctx, gen.CreatePuzzleParams{
@@ -33,14 +33,14 @@ func (s *Store) SavePuzzle(ctx context.Context, p puzzle.GeneratedPuzzle, model 
 	})
 
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
 
 	for i, c := range p.Clues {
 		normalizedClue, err := puzzle.Normalize(c)
 
 		if err != nil {
-			return -1, err
+			return 0, err
 		}
 
 		clueID, err := qtx.UpsertClue(ctx, gen.UpsertClueParams{
@@ -49,7 +49,7 @@ func (s *Store) SavePuzzle(ctx context.Context, p puzzle.GeneratedPuzzle, model 
 		})
 
 		if err != nil {
-			return -1, err
+			return 0, err
 		}
 
 		if err := qtx.LinkClue(ctx, gen.LinkClueParams{
@@ -57,7 +57,7 @@ func (s *Store) SavePuzzle(ctx context.Context, p puzzle.GeneratedPuzzle, model 
 			ClueID:   clueID,
 			Position: int64(i + 1),
 		}); err != nil {
-			return -1, err
+			return 0, err
 		}
 	}
 
