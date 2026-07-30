@@ -76,8 +76,21 @@ func (s *Store) GetPuzzleCluesUpTo(ctx context.Context, id int64, position int64
 	})
 }
 
-func (s *Store) PuzzleSupply(ctx context.Context) (gen.PuzzleSupplyRow, error) {
-	return s.queries.PuzzleSupply(ctx)
+func (s *Store) PuzzleSupply(ctx context.Context) (PuzzleSupply, error) {
+	var result PuzzleSupply
+
+	row, err := s.queries.PuzzleSupply(ctx)
+
+	if err != nil {
+		return result, err
+	}
+
+	result = PuzzleSupply{
+		Unplayed: row.Unplayed,
+		Players:  row.Players,
+	}
+
+	return result, nil
 }
 
 func (s *Store) CreateGame(ctx context.Context, playerID string, puzzleID int64) (string, error) {
@@ -99,17 +112,30 @@ func (s *Store) CreateGame(ctx context.Context, playerID string, puzzleID int64)
 	return gameID, nil
 }
 
-func (s *Store) GetGame(ctx context.Context, id string, playerID string) (gen.GetGameRow, error) {
+func (s *Store) GetGame(ctx context.Context, id string, playerID string) (Game, error) {
+	var result Game
+
 	row, err := s.queries.GetGame(ctx, gen.GetGameParams{
 		ID:       id,
 		PlayerID: playerID,
 	})
 
-	if errors.Is(err, sql.ErrNoRows) {
-		return row, ErrNotFound
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return result, ErrNotFound
+		}
+		return result, err
 	}
 
-	return row, err
+	result = Game{
+		ID:         row.ID,
+		PuzzleID:   row.PuzzleID,
+		CluesShown: row.CluesShown,
+		Completed:  row.Completed,
+		Won:        row.Won,
+	}
+
+	return result, nil
 }
 
 func (s *Store) CompleteGame(ctx context.Context, id string, completedAt string, won bool) (int64, error) {
