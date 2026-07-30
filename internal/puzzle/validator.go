@@ -7,6 +7,8 @@ import (
 	"unicode"
 )
 
+const ClueCount = 5
+
 // Validate reports whether p is a well-formed puzzle. It returns nil if the
 // puzzle is usable, or a ValidationError carrying the RejectionReason of the
 // first rule that failed. Rules are checked in a fixed order, so a puzzle that
@@ -16,10 +18,10 @@ import (
 // library, since that requires the stored puzzles. Callers must apply that
 // check separately, using ReasonDuplicateAnswer.
 func Validate(p GeneratedPuzzle) error {
-	if len(p.Clues) != 5 {
+	if len(p.Clues) != ClueCount {
 		return ValidationError{
 			Reason: ReasonIncorrectClueCount,
-			Detail: fmt.Sprintf("expected 5 clues, got %d", len(p.Clues)),
+			Detail: fmt.Sprintf("expected %d clues, got %d", ClueCount, len(p.Clues)),
 		}
 	}
 

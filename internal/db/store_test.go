@@ -193,8 +193,8 @@ func TestSavePuzzleRollsBackOnDuplicateAnswer(t *testing.T) {
 		t.Fatalf("counting clues: %v", err)
 	}
 
-	if clueCount != 5 {
-		t.Errorf("clue count = %d, want 5", clueCount)
+	if clueCount != puzzle.ClueCount {
+		t.Errorf("clue count = %d, want %d", clueCount, puzzle.ClueCount)
 	}
 }
 
