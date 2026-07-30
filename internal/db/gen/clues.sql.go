@@ -9,6 +9,64 @@ import (
 	"context"
 )
 
+const getPuzzleClue = `-- name: GetPuzzleClue :one
+SELECT c.text FROM clues c
+  INNER JOIN puzzle_clues pc
+    ON pc.clue_id = c.id
+
+  WHERE pc.puzzle_id = ? AND pc.position = ?
+`
+
+type GetPuzzleClueParams struct {
+	PuzzleID int64 `json:"puzzle_id"`
+	Position int64 `json:"position"`
+}
+
+func (q *Queries) GetPuzzleClue(ctx context.Context, arg GetPuzzleClueParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, getPuzzleClue, arg.PuzzleID, arg.Position)
+	var text string
+	err := row.Scan(&text)
+	return text, err
+}
+
+const getPuzzleCluesUpTo = `-- name: GetPuzzleCluesUpTo :many
+SELECT c.text FROM clues c
+  INNER JOIN puzzle_clues pc
+    ON pc.clue_id = c.id
+
+  WHERE pc.puzzle_id = ? AND pc.position <= ?
+    
+ORDER BY pc.position
+`
+
+type GetPuzzleCluesUpToParams struct {
+	PuzzleID int64 `json:"puzzle_id"`
+	Position int64 `json:"position"`
+}
+
+func (q *Queries) GetPuzzleCluesUpTo(ctx context.Context, arg GetPuzzleCluesUpToParams) ([]string, error) {
+	rows, err := q.db.QueryContext(ctx, getPuzzleCluesUpTo, arg.PuzzleID, arg.Position)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var text string
+		if err := rows.Scan(&text); err != nil {
+			return nil, err
+		}
+		items = append(items, text)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const linkClue = `-- name: LinkClue :exec
 INSERT INTO puzzle_clues (puzzle_id, clue_id, position)
   VALUES (?, ?, ?)
