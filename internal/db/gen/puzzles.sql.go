@@ -84,10 +84,68 @@ func (q *Queries) FindExistingAnswers(ctx context.Context, answers []string) ([]
 	return items, nil
 }
 
+const getPuzzle = `-- name: GetPuzzle :one
+SELECT id, answer, answer_normalized, category, difficulty, source_model, created_at FROM puzzles
+  WHERE id = ?
+`
+
+func (q *Queries) GetPuzzle(ctx context.Context, id int64) (Puzzle, error) {
+	row := q.db.QueryRowContext(ctx, getPuzzle, id)
+	var i Puzzle
+	err := row.Scan(
+		&i.ID,
+		&i.Answer,
+		&i.AnswerNormalized,
+		&i.Category,
+		&i.Difficulty,
+		&i.SourceModel,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getRandomUnplayedPuzzle = `-- name: GetRandomUnplayedPuzzle :one
+SELECT p.id FROM puzzles p
+  WHERE NOT EXISTS (
+    SELECT 1 FROM games g
+      WHERE g.puzzle_id = p.id
+        AND g.player_id = ? AND g.completed = 1
+  )
+    
+ORDER BY RANDOM()
+LIMIT 1
+`
+
+func (q *Queries) GetRandomUnplayedPuzzle(ctx context.Context, playerID string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getRandomUnplayedPuzzle, playerID)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const puzzleSupply = `-- name: PuzzleSupply :one
+SELECT
+  (SELECT COUNT(*) FROM puzzles) -
+  (SELECT COUNT(DISTINCT puzzle_id) FROM games WHERE completed = 1) AS unplayed,
+  (SELECT COUNT(DISTINCT player_id) FROM games) AS players
+`
+
+type PuzzleSupplyRow struct {
+	Unplayed int64 `json:"unplayed"`
+	Players  int64 `json:"players"`
+}
+
+func (q *Queries) PuzzleSupply(ctx context.Context) (PuzzleSupplyRow, error) {
+	row := q.db.QueryRowContext(ctx, puzzleSupply)
+	var i PuzzleSupplyRow
+	err := row.Scan(&i.Unplayed, &i.Players)
+	return i, err
+}
+
 const recentAnswers = `-- name: RecentAnswers :many
 SELECT answer FROM puzzles
-  ORDER BY created_at DESC
-  LIMIT ?
+ORDER BY created_at DESC
+LIMIT ?
 `
 
 func (q *Queries) RecentAnswers(ctx context.Context, limit int64) ([]string, error) {
