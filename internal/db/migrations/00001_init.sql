@@ -33,6 +33,7 @@ CREATE TABLE answer_aliases (
 
 CREATE TABLE games (
   id           TEXT PRIMARY KEY,
+  player_id    TEXT NOT NULL,
   puzzle_id    INTEGER NOT NULL REFERENCES puzzles(id) ON DELETE RESTRICT,
   clues_shown  INTEGER NOT NULL DEFAULT 1 CHECK (clues_shown BETWEEN 1 AND 5),
   completed    BOOLEAN NOT NULL DEFAULT 0,
@@ -40,6 +41,7 @@ CREATE TABLE games (
   started_at   TEXT NOT NULL,
   completed_at TEXT
 );
+CREATE INDEX idx_games_player ON games(player_id, puzzle_id);
 CREATE INDEX idx_games_puzzle ON games(puzzle_id);
 
 CREATE TABLE prompt_templates (

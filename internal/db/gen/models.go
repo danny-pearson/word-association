@@ -17,6 +17,7 @@ type Clue struct {
 
 type Game struct {
 	ID          string  `json:"id"`
+	PlayerID    string  `json:"player_id"`
 	PuzzleID    int64   `json:"puzzle_id"`
 	CluesShown  int64   `json:"clues_shown"`
 	Completed   bool    `json:"completed"`
